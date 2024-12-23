@@ -1,1 +1,1 @@
-{"default":{"identifier":"default","description":"enables the default permissions","local":true,"windows":["main"],"permissions":["core:default"]}}
+{"default":{"identifier":"default","description":"enables the default permissions","local":true,"windows":["main"],"permissions":[{"identifier":"core:default"},{"identifier":"fs:allow-read-text-file","allow":[{"path":"$HOME/Library/Mobile Documents/com~apple~CloudDocs/Family/Recipes/**/*.md"}]}]}}

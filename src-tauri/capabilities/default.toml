@@ -1,0 +1,15 @@
+identifier = "default"
+description = "enables the default permissions"
+
+windows = [
+	"main",
+]
+
+[[permissions]]
+identifier = "core:default"
+
+[[permissions]]
+identifier = "fs:allow-read-text-file"
+allow = [
+	{ path = "$HOME/Library/Mobile Documents/com~apple~CloudDocs/Family/Recipes/**/*.md" }
+]

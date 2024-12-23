@@ -1,0 +1,7 @@
+{
+	"compilerOptions": {
+		// Vite's transpiling modules in isolation so we should make sure our
+		// compiler settings reflect that reality.
+		"isolatedModules": true
+	}
+}
