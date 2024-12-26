@@ -16,7 +16,7 @@ export function App() {
 	return (
 		<>
 			<h1>SousChef</h1>
-			<div>{ recipe }</div>
+			<pre>{ recipe }</pre>
 		</>
 	)
 }
