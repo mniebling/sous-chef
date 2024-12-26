@@ -2,6 +2,9 @@
 	"compilerOptions": {
 		// Vite's transpiling modules in isolation so we should make sure our
 		// compiler settings reflect that reality.
-		"isolatedModules": true
+		"isolatedModules": true,
+		// Make React's JSX globally available in `tsx` files without explicit imports.
+		"jsx": "react-jsx",
+		"jsxImportSource": "react"
 	}
 }

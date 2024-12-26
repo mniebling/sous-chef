@@ -1,4 +1,7 @@
 {
+	"editor.codeActionsOnSave": {
+		"source.organizeImports": "explicit"
+	},
 	"editor.insertSpaces": false,
 	"typescript.tsdk": "node_modules/typescript/lib"
 }

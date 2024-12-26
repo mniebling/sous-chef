@@ -1,11 +1,27 @@
-// Not even using a framework or anything to begin.
-// First step is using Tauri's fs access to grab a recipe file and start
-// experimenting with rendering.
-
 import { homeDir } from '@tauri-apps/api/path'
 import { readTextFile } from '@tauri-apps/plugin-fs'
+import { useEffect, useState } from 'react'
 
 
+export function App() {
+
+	const [recipe, setRecipe] = useState<string>('')
+
+	useEffect(() => {
+		loadRecipe().then(content => {
+			setRecipe(content)
+		})
+	}, [])
+
+	return (
+		<>
+			<h1>SousChef</h1>
+			<div>{ recipe }</div>
+		</>
+	)
+}
+
+// First step is using Tauri's fs access to grab a recipe file and start experimenting with rendering.
 async function loadRecipe() {
 
 	try {
@@ -21,8 +37,3 @@ async function loadRecipe() {
 		console.error('Error reading file', e)
 	}
 }
-
-loadRecipe().then(content => {
-
-	document.body.innerHTML = content
-})
