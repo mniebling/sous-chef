@@ -5,6 +5,8 @@
 		"isolatedModules": true,
 		// Make React's JSX globally available in `tsx` files without explicit imports.
 		"jsx": "react-jsx",
-		"jsxImportSource": "react"
+		"jsxImportSource": "react",
+		// TODO: figure out what the correct lib/target should be for Tauri's esbuild bundling.
+		"lib": ["DOM", "ES2018"]
 	}
 }

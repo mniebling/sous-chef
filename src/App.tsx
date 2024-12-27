@@ -1,39 +1,50 @@
-import { homeDir } from '@tauri-apps/api/path'
-import { readTextFile } from '@tauri-apps/plugin-fs'
+import { invoke } from '@tauri-apps/api/core'
 import { useEffect, useState } from 'react'
 
+type Recipe = {
+	content: string
+	hash: string
+}
 
+// The current approach is that Tauri reads the recipe directory and the frontend
+// can fetch the entire list of recipes from it. We create a map of recipes here
+// and then allow the user to click a recipe hash (lol) to view its raw Markdown.
+// A good next step would be to parse the frontmatter so we can display titles.
 export function App() {
 
-	const [recipe, setRecipe] = useState<string>('')
+	const [recipes, setRecipes] = useState<Map<string, Recipe>>(new Map())
+	const [selectedRecipeHash, setSelectedRecipeHash] = useState<string>('')
 
 	useEffect(() => {
-		loadRecipe().then(content => {
-			setRecipe(content)
+		loadRecipes().then((results: Recipe[]) => {
+			setRecipes(new Map(results.map(r => ([r.hash, r]))))
 		})
 	}, [])
 
 	return (
 		<>
-			<h1>SousChef</h1>
-			<pre>{ recipe }</pre>
+			<strong>Recipes:</strong>
+			<ul>
+				{ Array.from(recipes).map(([hash, _recipe]) => (
+					<li key={ hash }>
+						<a href="#" onClick={ () => setSelectedRecipeHash(hash) }>{ hash }</a>
+					</li>
+				)) }
+			</ul>
+			<hr />
+			<pre>{ recipes.get(selectedRecipeHash)?.content || '' }</pre>
 		</>
 	)
 }
 
-// First step is using Tauri's fs access to grab a recipe file and start experimenting with rendering.
-async function loadRecipe() {
+async function loadRecipes() {
 
 	try {
-		const home = await homeDir()
-		const iCloudPath = `${home}/Library/Mobile Documents/com~apple~CloudDocs/Family/Recipes`
-		const filePath = `${iCloudPath}/pork green chili.md`
-
-		const content = await readTextFile(filePath)
-
-		return content
+		const recipes = await invoke('list_recipes')
+		console.log(recipes)
+		return recipes
 	}
 	catch (e) {
-		console.error('Error reading file', e)
+		console.error('Error loading recipes', e)
 	}
 }
