@@ -1,10 +1,7 @@
 import { invoke } from '@tauri-apps/api/core'
 import { useEffect, useState } from 'react'
-
-type Recipe = {
-	content: string
-	hash: string
-}
+import { RecipeView } from './RecipeView'
+import type { Recipe } from './typings/recipe'
 
 // The current approach is that Tauri reads the recipe directory and the frontend
 // can fetch the entire list of recipes from it. We create a map of recipes here
@@ -32,7 +29,7 @@ export function App() {
 				)) }
 			</ul>
 			<hr />
-			<pre>{ recipes.get(selectedRecipeHash)?.content || '' }</pre>
+			<RecipeView recipe={ recipes.get(selectedRecipeHash) } />
 		</>
 	)
 }
