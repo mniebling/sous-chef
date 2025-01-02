@@ -28,7 +28,7 @@ export function App() {
 					</li>
 				)) }
 			</ul>
-			<hr />
+
 			<RecipeView recipe={ recipes.get(selectedRecipeHash) } />
 		</>
 	)

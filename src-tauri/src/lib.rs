@@ -5,7 +5,7 @@ pub fn run() {
 	tauri::Builder::default()
 		.plugin(tauri_plugin_fs::init())
 		.invoke_handler(tauri::generate_handler![
-			commands::list_recipes,
+			commands::list_recipes::list_recipes,
 		])
 		.setup(|app| {
 			if cfg!(debug_assertions) {
