@@ -22,13 +22,13 @@ export function App() {
 		<>
 			<strong>Recipes:</strong>
 			<ul>
-				{ Array.from(recipes).map(([hash, _recipe]) => (
+				{ Array.from(recipes).map(([hash, recipe]) => (
 					<li key={ hash }>
-						<a href="#" onClick={ () => setSelectedRecipeHash(hash) }>{ hash }</a>
+						<a href="#" onClick={ () => setSelectedRecipeHash(hash) }>{ recipe.title }</a>
 					</li>
 				)) }
 			</ul>
-
+			<hr />
 			<RecipeView recipe={ recipes.get(selectedRecipeHash) } />
 		</>
 	)
