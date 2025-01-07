@@ -1,14 +1,33 @@
 use gray_matter::{engine::YAML, Matter};
+use serde::{Deserialize, Serialize};
 use sha2::{Sha256, Digest};
 use std::fs;
 use tauri::Manager;
 
 
-#[derive(Debug, serde::Serialize)]
+#[derive(Debug, Serialize)]
 pub struct Recipe {
 	content: String,
 	hash: String,
+	metadata: RecipeMetadata,
 	title: String,
+}
+
+// gray_matter's deserializer will only "fill in" properties defined in this struct
+// They must be optional or the deserializer will panic if one is not present
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+struct RecipeMetadata {
+	#[serde(skip_serializing_if = "Option::is_none")]
+	servings: Option<i64>, // TODO: handle non-integer "servings"
+	#[serde(skip_serializing_if = "Option::is_none")]
+	source: Option<String>,
+	#[serde(skip_serializing_if = "Option::is_none")]
+	tags: Option<Vec<String>>,
+	#[serde(skip_serializing_if = "Option::is_none")]
+	time: Option<String>,
+	#[serde(skip_serializing_if = "Option::is_none")]
+	title: Option<String>,
 }
 
 #[tauri::command]
@@ -46,13 +65,13 @@ pub async fn list_recipes(app_handle: tauri::AppHandle) -> Result<Vec<Recipe>, S
 			let matter_result = matter.parse(&content);
 			let markdown_content = matter_result.content;
 
-			// Set the title based on the metadata
-			let title = matter_result.data.as_ref()
+			let frontmatter: RecipeMetadata = matter_result.data.as_ref()
 				.expect("Frontmatter should not be empty")
-				.as_hashmap()
-				.expect("Frontmatter should be parseable into a HashMap")
-				.get("title") // -> Option<&Pod>
-				.and_then(|v| v.as_string().ok()) // -> Option<String>
+				.deserialize()
+				.expect("Frontmatter should be deserializable into RecipeMetadata struct");
+
+			// Set the title based on the metadata, or filename if `title` frontmatter is missing
+			let title = frontmatter.title.clone() // -> Option<String>
 				.unwrap_or_else(|| {
 					path.file_stem()
 						.and_then(|s| s.to_str()) // Convert OsStr to &str
@@ -60,12 +79,17 @@ pub async fn list_recipes(app_handle: tauri::AppHandle) -> Result<Vec<Recipe>, S
 						.unwrap_or("Untitled".to_string())
 				});
 
-			// Add it to our in-memory list
-			recipes.push(Recipe {
+			let recipe = Recipe {
 				content: markdown_content,
 				hash,
+				metadata: frontmatter,
 				title,
-			});
+			};
+
+			println!("Recipe parsed: {:?}", recipe.metadata);
+
+			// Add it to our in-memory list
+			recipes.push(recipe);
 		}
 	}
 

@@ -29,6 +29,9 @@ export function RecipeView(props: RecipeViewProps) {
 	}, [props.recipe?.content])
 
 	return (
-		<div dangerouslySetInnerHTML={{ __html: html }} />
+		<div>
+			<pre>{ JSON.stringify(props.recipe?.metadata, null, 2) }</pre>
+			<div dangerouslySetInnerHTML={{ __html: html }} />
+		</div>
 	)
 }
