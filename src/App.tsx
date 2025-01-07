@@ -1,5 +1,6 @@
 import { invoke } from '@tauri-apps/api/core'
 import { useEffect, useState } from 'react'
+import './App.css'
 import { RecipeView } from './RecipeView'
 import type { Recipe } from './typings/recipe'
 

@@ -1,0 +1,22 @@
+body {
+	font-family: system-ui, sans-serif; /* https://modernfontstacks.com/ */
+}
+
+p {
+	line-height: 1.4;
+}
+
+pre {
+	background-color: #f5f5f5;
+	font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', 'Droid Sans Mono';
+	font-size: 12px;
+	padding: 4px;
+}
+
+ul {
+	padding-inline-start: 25px;
+}
+
+li {
+	margin: 5px 0;
+}
