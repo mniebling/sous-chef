@@ -1,5 +1,7 @@
 body {
 	font-family: system-ui, sans-serif; /* https://modernfontstacks.com/ */
+	margin: 0;
+	padding: 0;
 }
 
 p {
@@ -10,7 +12,7 @@ pre {
 	background-color: #f5f5f5;
 	font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', 'Droid Sans Mono';
 	font-size: 12px;
-	padding: 4px;
+	padding: 6px 8px;
 }
 
 ul {

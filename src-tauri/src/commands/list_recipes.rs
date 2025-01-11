@@ -1,37 +1,11 @@
+use crate::state::{Recipe, RecipeMetadata, RecipeState};
 use gray_matter::{engine::YAML, Matter};
-use serde::{Deserialize, Serialize};
 use sha2::{Sha256, Digest};
 use std::fs;
-use tauri::Manager;
+use tauri::{Manager, State};
 
+fn read_recipes_from_fs(app_handle: &tauri::AppHandle) -> Result<Vec<Recipe>, String> {
 
-#[derive(Debug, Serialize)]
-pub struct Recipe {
-	content: String,
-	hash: String,
-	metadata: RecipeMetadata,
-	title: String,
-}
-
-// gray_matter's deserializer will only "fill in" properties defined in this struct
-// They must be optional or the deserializer will panic if one is not present
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-struct RecipeMetadata {
-	#[serde(skip_serializing_if = "Option::is_none")]
-	servings: Option<i64>, // TODO: handle non-integer "servings"
-	#[serde(skip_serializing_if = "Option::is_none")]
-	source: Option<String>,
-	#[serde(skip_serializing_if = "Option::is_none")]
-	tags: Option<Vec<String>>,
-	#[serde(skip_serializing_if = "Option::is_none")]
-	time: Option<String>,
-	#[serde(skip_serializing_if = "Option::is_none")]
-	title: Option<String>,
-}
-
-#[tauri::command]
-pub async fn list_recipes(app_handle: tauri::AppHandle) -> Result<Vec<Recipe>, String> {
 	// Still hard-coding the recipes folder to my own iCloud Drive.
 	let recipes_dir = app_handle
 		.path()
@@ -87,10 +61,27 @@ pub async fn list_recipes(app_handle: tauri::AppHandle) -> Result<Vec<Recipe>, S
 			};
 
 			println!("Recipe parsed: {:?}", recipe.metadata);
-
-			// Add it to our in-memory list
 			recipes.push(recipe);
 		}
+	}
+
+	Ok(recipes)
+}
+
+
+#[tauri::command]
+pub async fn list_recipes(
+	app_handle: tauri::AppHandle,
+	recipe_state: State<'_, RecipeState>,
+) -> Result<Vec<Recipe>, String> {
+
+	let mut recipes = recipe_state.list_recipes()?;
+
+	// This isn't a permanent solution, we'll end up moving the fs access into a wizard
+	// or doing it when the app loads or something. But this is fine for right now.
+	if recipes.is_empty() {
+		recipes = read_recipes_from_fs(&app_handle)?;
+		recipe_state.set_recipes(recipes.clone())?;
 	}
 
 	Ok(recipes)

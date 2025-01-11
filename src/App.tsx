@@ -1,48 +1,62 @@
-import { invoke } from '@tauri-apps/api/core'
 import { useEffect, useState } from 'react'
 import './App.css'
+import { RecipeList } from './RecipeList'
 import { RecipeView } from './RecipeView'
-import type { Recipe } from './typings/recipe'
 
-// The current approach is that Tauri reads the recipe directory and the frontend
-// can fetch the entire list of recipes from it. We create a map of recipes here
-// and then allow the user to click a recipe hash (lol) to view its raw Markdown.
-// A good next step would be to parse the frontmatter so we can display titles.
-export function App() {
 
-	const [recipes, setRecipes] = useState<Map<string, Recipe>>(new Map())
-	const [selectedRecipeHash, setSelectedRecipeHash] = useState<string>('')
-
-	useEffect(() => {
-		loadRecipes().then((results: Recipe[]) => {
-			setRecipes(new Map(results.map(r => ([r.hash, r]))))
-		})
-	}, [])
-
-	return (
-		<>
-			<strong>Recipes:</strong>
-			<ul>
-				{ Array.from(recipes).map(([hash, recipe]) => (
-					<li key={ hash }>
-						<a href="#" onClick={ () => setSelectedRecipeHash(hash) }>{ recipe.title }</a>
-					</li>
-				)) }
-			</ul>
-			<hr />
-			<RecipeView recipe={ recipes.get(selectedRecipeHash) } />
-		</>
-	)
+type AppState = {
+	selectedRecipeHash: string
+	view: ViewName
 }
 
-async function loadRecipes() {
+type ViewName =
+	| 'recipe-list'
+	| 'recipe-view'
 
-	try {
-		const recipes = await invoke('list_recipes')
-		console.log(recipes)
-		return recipes
-	}
-	catch (e) {
-		console.error('Error loading recipes', e)
+const EVENTS = {
+	NAVIGATE_TO_RECIPE: 'web:navigate-to-recipe',
+	NAVIGATE_TO_RECIPES_LIST: 'web:navigate-to-recipes-list',
+}
+
+export function App() {
+
+	const [appState, setAppState] = useState<AppState>({
+		selectedRecipeHash: '',
+		view: 'recipe-list',
+	})
+
+	// Using an event listener architecture because that's a way Tauri's backend
+	// can also communicate with the frontend.
+	useEffect(() => {
+		// TODO: type-safe event payloads
+		function navigateToRecipeHandler(event) {
+			setAppState({
+				selectedRecipeHash: event.detail?.recipeHash || '',
+				view: 'recipe-view',
+			})
+		}
+
+		function navigateToRecipesListHandler() {
+			setAppState(previous => ({
+				...previous,
+				view: 'recipe-list',
+			}))
+		}
+
+		// TODO: centralize event listener
+		window.addEventListener(EVENTS.NAVIGATE_TO_RECIPE, navigateToRecipeHandler as EventListener)
+		window.addEventListener(EVENTS.NAVIGATE_TO_RECIPES_LIST, navigateToRecipesListHandler as EventListener)
+
+		return () => {
+			window.removeEventListener(EVENTS.NAVIGATE_TO_RECIPE, navigateToRecipeHandler as EventListener)
+			window.removeEventListener(EVENTS.NAVIGATE_TO_RECIPES_LIST, navigateToRecipesListHandler as EventListener)
+		}
+	}, [])
+
+	switch (appState.view) {
+		case 'recipe-list':
+			return <RecipeList />
+		case 'recipe-view':
+			return <RecipeView recipeHash={ appState.selectedRecipeHash } />
 	}
 }

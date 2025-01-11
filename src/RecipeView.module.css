@@ -1,0 +1,21 @@
+.navContainer {
+	align-items: center;
+	background-color: #ddd;
+	display: flex;
+	padding: 6px;
+	position: relative;
+}
+
+.backButton {
+	left: 4px;
+	position: absolute;
+}
+
+.recipeTitle {
+	font-weight: bold;
+	margin: 0 auto;
+}
+
+.recipeContainer {
+	padding: 6px 12px;
+}
