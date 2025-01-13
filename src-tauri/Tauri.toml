@@ -1,12 +1,9 @@
-identifier = "com.tauri.dev"
+identifier = "com.mniebling.souschef"
 product-name = "sous-chef"
 version = "0.1.0"
 
-[build]
-before-build-command = "npm run build"
-before-dev-command = "npm start"
-dev-url = "http://localhost:5173"
-frontend-dist = ".."
+[app.security]
+csp = ""
 
 [[app.windows]]
 fullscreen = false
@@ -15,8 +12,11 @@ resizable = true
 title = "SousChef"
 width = 800
 
-[app.security]
-csp = ""
+[build]
+before-build-command = "npm run frontend:build"
+before-dev-command = "npm run frontend:serve"
+dev-url = "http://localhost:5173"
+frontend-dist = "../dist-frontend"
 
 [bundle]
 active = true
@@ -28,3 +28,12 @@ icon = [
 	"icons/icon.icns",
 	"icons/icon.ico"
 ]
+
+[bundle.macos]
+hardened-runtime = true
+minimum-system-version = "10.13"
+
+[bundle.macos.dmg]
+app-position = { x = 180, y = 170 }
+application-folder-position = { x = 480, y = 170 }
+window-size = { width = 660, height = 400 }

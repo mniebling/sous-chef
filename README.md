@@ -17,5 +17,8 @@ SousChef is a [Tauri](https://v2.tauri.app/start/) application; it's much simple
 Once you have those dependencies available:
 
 1. Install NPM dependencies with `npm ci`.
-2. Run the frontend with `npm start`.
-3. In a seperate terminal, run the Tauri app with `cargo tauri dev`.
+2. Run the application with `npm start`. The Tauri CLI will build and serve the frontend, then launch the Rust app.
+
+Other useful commands:
+
+`npm run build`: Builds the entire app with Tauri, writing binaries to `/src-tauri/target/release`.
