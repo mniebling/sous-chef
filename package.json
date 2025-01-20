@@ -4,7 +4,7 @@
 	"description": "A recipe management app",
 	"main": "index.js",
 	"scripts": {
-		"build": "tauri build",
+		"build": "tauri build --bundles app --target universal-apple-darwin",
 		"frontend:build": "vite build",
 		"frontend:serve": "vite",
 		"start": "tauri dev",
