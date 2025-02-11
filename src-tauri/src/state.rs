@@ -4,9 +4,14 @@ use std::sync::Mutex;
 
 #[derive(Debug, Clone, Serialize)]
 pub struct Recipe {
-	pub content: String,
 	pub hash: String,
+	/** Raw Markdown containing the parsed Ingredients section. */
+	pub ingredients: String,
+	/** Raw Markdown containing the parsed Instructions section. */
+	pub instructions: String,
 	pub metadata: RecipeMetadata,
+	/** The full content of the file as originally parsed. We might not need this... */
+	pub original_content: String,
 	pub title: String,
 }
 

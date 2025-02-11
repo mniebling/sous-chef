@@ -15,6 +15,10 @@ pre {
 	padding: 6px 8px;
 }
 
+h2 {
+	margin-top: 0;
+}
+
 ul {
 	padding-inline-start: 25px;
 }

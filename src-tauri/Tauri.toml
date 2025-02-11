@@ -7,10 +7,10 @@ csp = ""
 
 [[app.windows]]
 fullscreen = false
-height = 600
+height = 800
 resizable = true
 title = "SousChef"
-width = 800
+width = 1200
 
 [build]
 before-build-command = "npm run frontend:build"

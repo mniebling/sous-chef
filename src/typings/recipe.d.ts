@@ -1,6 +1,8 @@
 export interface Recipe {
-	content: string
 	hash: string
+	ingredients: string
+	instructions: string
 	metadata: Record<string, unknown>
+	original_content: string
 	title: string
 }

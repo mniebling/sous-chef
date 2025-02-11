@@ -16,7 +16,8 @@ export interface RecipeViewProps {
 // TODO: Surface to the user when a recipe hash isn't found.
 export function RecipeView(props: RecipeViewProps) {
 
-	const [html, setHtml] = useState<string>('')
+	const [ingredientsHtml, setIngredientsHtml] = useState<string>('')
+	const [instructionsHtml, setInstructionsHtml] = useState<string>('')
 	const [recipe, setRecipe] = useState<Recipe | null>(null)
 	const [wakeLockError, setWakeLockError] = useState<string | null>(null)
 
@@ -56,15 +57,20 @@ export function RecipeView(props: RecipeViewProps) {
 
 		if (!recipe) return
 
-		unified()
+		const processor = unified()
 			.use(remarkParse) // convert the Markdown into an AST (mdast)
 			.use(remarkRehype) // convert the Markdown AST into an HTML AST (hast)
 			.use(rehypeSanitize) // remove dangerous tags
 			.use(rehypeStringify) // convert the HTML AST into an HTML string
-			.process(recipe.content)
-			.then(file => {
-				setHtml(String(file))
-			})
+
+		Promise.all([
+			processor.process(recipe.ingredients),
+			processor.process(recipe.instructions),
+		])
+		.then(([ingredients, instructions]) => {
+			setIngredientsHtml(String(ingredients))
+			setInstructionsHtml(String(instructions))
+		})
 	}, [recipe])
 
 	return (
@@ -77,7 +83,11 @@ export function RecipeView(props: RecipeViewProps) {
 
 			<main className={ css.recipeContainer }>
 				<pre>{ JSON.stringify(recipe?.metadata, null, 2) }</pre>
-				<div dangerouslySetInnerHTML={{ __html: html }} />
+
+				<div className={ css.recipeTextContainer }>
+					<div className={ css.ingredients } dangerouslySetInnerHTML={{ __html: ingredientsHtml }} />
+					<div className={ css.instructions } dangerouslySetInnerHTML={{ __html: instructionsHtml }} />
+				</div>
 
 				{ !wakeLock.current?.released && (
 					<div className={ classNames(css.screenLockStatus, { [css.isError]: !!wakeLockError }) }>

@@ -4,6 +4,43 @@ use sha2::{Sha256, Digest};
 use std::fs;
 use tauri::{Manager, State};
 
+/**
+ * We expect a Markdown h2 with `## Ingredients` to denote the ingredients section.
+ * If present, we'll parse that into a separate block from instructions.
+ * If it's not present, everything goes into instructions.
+ */
+fn parse_recipe_content(content: &str) -> (String, String) {
+
+	let lines: Vec<&str> = content.lines().collect();
+
+	let mut ingredients = String::new();
+	let mut instructions = String::new();
+	let mut current_section = &mut instructions;
+
+	for line in lines {
+		// Check for level 2 header
+		if line.starts_with("## ") {
+			let header = line.trim_start_matches("## ").trim().to_lowercase();
+
+			current_section = if header == "ingredients" {
+				&mut ingredients
+			}
+			else {
+				&mut instructions
+			};
+		}
+
+		current_section.push_str(line);
+		current_section.push('\n');
+	}
+
+	if ingredients.is_empty() {
+		instructions = content.to_string();
+	}
+
+	(ingredients.trim().to_string(), instructions.trim().to_string())
+}
+
 fn read_recipes_from_fs(app_handle: &tauri::AppHandle) -> Result<Vec<Recipe>, String> {
 
 	// Still hard-coding the recipes folder to my own iCloud Drive.
@@ -37,7 +74,10 @@ fn read_recipes_from_fs(app_handle: &tauri::AppHandle) -> Result<Vec<Recipe>, St
 			let matter = Matter::<YAML>::new();
 
 			let matter_result = matter.parse(&content);
-			let markdown_content = matter_result.content;
+			let markdown_content = matter_result.content; // TODO: we might not use this anymore
+
+			// Parse content into ingredients & instructions sections
+			let (ingredients, instructions) = parse_recipe_content(&markdown_content);
 
 			let frontmatter: RecipeMetadata = matter_result.data.as_ref()
 				.expect("Frontmatter should not be empty")
@@ -54,8 +94,10 @@ fn read_recipes_from_fs(app_handle: &tauri::AppHandle) -> Result<Vec<Recipe>, St
 				});
 
 			let recipe = Recipe {
-				content: markdown_content,
+				original_content: markdown_content,
 				hash,
+				ingredients,
+				instructions,
 				metadata: frontmatter,
 				title,
 			};
