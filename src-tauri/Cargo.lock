@@ -3,6 +3,21 @@
 version = 4
 
 [[package]]
+name = "SousChef"
+version = "0.1.0"
+dependencies = [
+ "gray_matter",
+ "log",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-fs",
+ "tauri-plugin-log",
+]
+
+[[package]]
 name = "addr2line"
 version = "0.24.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3270,21 +3285,6 @@ dependencies = [
  "gobject-sys",
  "libc",
  "system-deps",
-]
-
-[[package]]
-name = "sous-chef"
-version = "0.1.0"
-dependencies = [
- "gray_matter",
- "log",
- "serde",
- "serde_json",
- "sha2",
- "tauri",
- "tauri-build",
- "tauri-plugin-fs",
- "tauri-plugin-log",
 ]
 
 [[package]]

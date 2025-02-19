@@ -13,6 +13,7 @@ pub fn run() {
 			commands::list_recipes::list_recipes,
 		])
 		.setup(|app| {
+
 			if cfg!(debug_assertions) {
 				app.handle().plugin(
 					tauri_plugin_log::Builder::default()
@@ -20,6 +21,30 @@ pub fn run() {
 						.build(),
 				)?;
 			}
+
+			// This text doesn't matter on macOS, the first top level menu will always use the application name.
+			let sous_chef_menu = tauri::menu::SubmenuBuilder::new(app, "SousChef")
+				.text("about", "About SousChef")
+				.separator()
+				.text("preferences", "Preferences")
+				.separator()
+				.quit()
+				.build()?;
+
+			let recipes_menu = tauri::menu::SubmenuBuilder::new(app, "Recipes")
+				.text("refresh_recipes", "Refresh Recipes")
+				.separator()
+				.text("import_recipe", "Import Recipe from Website…")
+				.build()?;
+
+			let menu = tauri::menu::MenuBuilder::new(app)
+				.items(&[
+					&sous_chef_menu,
+					&recipes_menu,
+				])
+				.build()?;
+
+			app.set_menu(menu)?;
 
 			app.manage(RecipeState::new());
 

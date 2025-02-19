@@ -1,5 +1,5 @@
 identifier = "com.mniebling.souschef"
-product-name = "sous-chef"
+product-name = "SousChef"
 version = "0.1.0"
 
 [app.security]
