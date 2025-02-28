@@ -1,4 +1,5 @@
 mod commands;
+mod menu;
 mod state;
 
 use tauri::Manager;
@@ -22,34 +23,14 @@ pub fn run() {
 				)?;
 			}
 
-			// This text doesn't matter on macOS, the first top level menu will always use the application name.
-			let sous_chef_menu = tauri::menu::SubmenuBuilder::new(app, "SousChef")
-				.text("about", "About SousChef")
-				.separator()
-				.text("preferences", "Preferences")
-				.separator()
-				.quit()
-				.build()?;
-
-			let recipes_menu = tauri::menu::SubmenuBuilder::new(app, "Recipes")
-				.text("refresh_recipes", "Refresh Recipes")
-				.separator()
-				.text("import_recipe", "Import Recipe from Website…")
-				.build()?;
-
-			let menu = tauri::menu::MenuBuilder::new(app)
-				.items(&[
-					&sous_chef_menu,
-					&recipes_menu,
-				])
-				.build()?;
-
+			let menu = menu::create_app_menu(app);
 			app.set_menu(menu)?;
 
 			app.manage(RecipeState::new());
 
 			Ok(())
 		})
+		.on_menu_event(menu::handle_menu_event)
 		.run(tauri::generate_context!())
 		.expect("error while running tauri application");
 }

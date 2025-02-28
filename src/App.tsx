@@ -1,3 +1,4 @@
+import { listen } from '@tauri-apps/api/event'
 import { useEffect, useState } from 'react'
 import './App.css'
 import { RecipeList } from './RecipeList'
@@ -50,6 +51,25 @@ export function App() {
 		return () => {
 			window.removeEventListener(EVENTS.NAVIGATE_TO_RECIPE, navigateToRecipeHandler as EventListener)
 			window.removeEventListener(EVENTS.NAVIGATE_TO_RECIPES_LIST, navigateToRecipesListHandler as EventListener)
+		}
+	}, [])
+
+	// TODO: Temporary code for menu event listening, modularize this later.
+	useEffect(() => {
+
+		// TODO: Generic is the payload; it's not really a string
+		// Also this promise is super awkward, we'll get it out of Effects.
+		let unlisten = undefined
+
+		listen('core:invoke-menu:about', () => {
+			console.info('Open the About menu')
+		})
+		.then(result => {
+			unlisten = result
+		})
+
+		return () => {
+			unlisten()
 		}
 	}, [])
 
