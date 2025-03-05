@@ -1,3 +1,4 @@
+use serde::Serialize;
 use tauri::{
 	menu::{Menu, MenuBuilder, MenuEvent, SubmenuBuilder}, App, AppHandle, Runtime, Emitter
 };
@@ -12,7 +13,7 @@ pub fn create_app_menu<R: Runtime>(app: &App<R>) -> Menu<R> {
 	let sous_chef_menu = SubmenuBuilder::new(app, "SousChef")
 		.text("about", "About SousChef")
 		.separator()
-		.text("preferences", "Preferences")
+		.text("settings", "Settings…")
 		.separator()
 		.quit()
 		.build();
@@ -37,6 +38,20 @@ pub fn create_app_menu<R: Runtime>(app: &App<R>) -> Menu<R> {
 	}
 }
 
+#[derive(Clone, Serialize)]
+enum MenuEventName {
+	About,
+	ImportRecipe,
+	RefreshRecipes,
+	Settings,
+}
+
+#[derive(Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct MenuEventPayload {
+	menu_name: MenuEventName,
+}
+
 /**
  * A pattern matcher that handles application menu events.
  * It either does work in the Tauri layer or emits events to the frontend.
@@ -46,20 +61,28 @@ pub fn handle_menu_event(app: &AppHandle, event: MenuEvent) {
 
 	match event.id().0.as_str() {
 		"about" => {
-			app.emit("core:invoke-menu:about", {})
-				.expect("Failed to emit core:invoke-menu:about");
+			app.emit("core:invoke-menu", MenuEventPayload {
+				menu_name: MenuEventName::About,
+			})
+			.expect("Failed to emit core:invoke-menu - About");
 		},
-		"preferences" => {
-			app.emit("core:invoke-menu:preferences", {})
-				.expect("Failed to emit core:invoke-menu:preferences");
+		"settings" => {
+			app.emit("core:invoke-menu", MenuEventPayload {
+				menu_name: MenuEventName::Settings,
+			})
+				.expect("Failed to emit core:invoke-menu - Settings");
 		},
 		"refresh_recipes" => {
-			app.emit("core:invoke-menu:refresh-recipes", {})
-				.expect("Failed to emit core:invoke-menu:refresh-recipes");
+			app.emit("core:invoke-menu", MenuEventPayload {
+				menu_name: MenuEventName::RefreshRecipes,
+			})
+				.expect("Failed to emit core:invoke-menu - RefreshRecipes");
 		},
 		"import_recipe" => {
-			app.emit("core:invoke-menu:import-recipe", {})
-				.expect("Failed to emit core:invoke-menu:import-recipe");
+			app.emit("core:invoke-menu", MenuEventPayload {
+				menu_name: MenuEventName::ImportRecipe,
+			})
+				.expect("Failed to emit core:invoke-menu - ImportRecipe");
 		},
 		_ => {
 			println!("Unexpected menu event: {:?}", event);

@@ -57,12 +57,12 @@ export function App() {
 	// TODO: Temporary code for menu event listening, modularize this later.
 	useEffect(() => {
 
-		// TODO: Generic is the payload; it's not really a string
+		// TODO: The generic param is the payload; it's not really a string
 		// Also this promise is super awkward, we'll get it out of Effects.
 		let unlisten = undefined
 
-		listen('core:invoke-menu:about', () => {
-			console.info('Open the About menu')
+		listen<string>('core:invoke-menu', (event) => {
+			console.info(event.payload)
 		})
 		.then(result => {
 			unlisten = result
