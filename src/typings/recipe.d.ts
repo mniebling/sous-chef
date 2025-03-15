@@ -1,4 +1,4 @@
-export interface Recipe {
+interface Recipe {
 	hash: string
 	ingredients: string
 	instructions: string

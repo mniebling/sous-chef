@@ -1,6 +1,6 @@
 import { invoke } from '@tauri-apps/api/core'
 import { useEffect, useState } from 'react'
-import { Recipe } from './typings/recipe'
+import { emit } from './events'
 
 
 export function RecipeList() {
@@ -20,7 +20,10 @@ export function RecipeList() {
 			<ul>
 				{ Array.from(recipes).map(([hash, recipe]) => (
 					<li key={ hash }>
-						<a href="#" onClick={ () => emitNavigationEvent(hash) }>{ recipe.title }</a>
+						<a
+							onClick={ () => emit('web:navigate-to-recipe', { recipeHash: hash }) }
+							href="#"
+						>{ recipe.title }</a>
 					</li>
 				)) }
 			</ul>
@@ -38,11 +41,4 @@ async function loadRecipes() {
 	catch (e) {
 		console.error('Error loading recipes', e)
 	}
-}
-
-function emitNavigationEvent(recipeHash: string) {
-
-	window.dispatchEvent(new CustomEvent('web:navigate-to-recipe', {
-		detail: { recipeHash },
-	}))
 }

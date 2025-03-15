@@ -6,8 +6,8 @@ import rehypeStringify from 'rehype-stringify'
 import remarkParse from 'remark-parse'
 import remarkRehype from 'remark-rehype'
 import { unified } from 'unified'
+import { emit } from './events'
 import css from './RecipeView.module.css'
-import { Recipe } from './typings/recipe'
 
 export interface RecipeViewProps {
 	recipeHash: string
@@ -116,5 +116,5 @@ async function getRecipe(recipeHash: string) {
 
 function navigateToRecipesList() {
 
-	window.dispatchEvent(new CustomEvent('web:navigate-to-recipes-list'))
+	emit('web:navigate-to-recipes-list')
 }
