@@ -34,7 +34,7 @@ export function RecipeView(props: RecipeViewProps) {
 			.catch((error) => {
 				console.error(error)
 				console.info('Redirecting to recipes list.')
-				emit('web:navigate-to-recipes-list')
+				navigateToRecipesList()
 			})
 	}, [props.dataLastUpdated, props.recipePathHash])
 
