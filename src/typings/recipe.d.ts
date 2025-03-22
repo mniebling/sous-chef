@@ -1,8 +1,9 @@
 interface Recipe {
-	hash: string
+	contentHash: string
 	ingredients: string
 	instructions: string
 	metadata: Record<string, unknown>
-	original_content: string
+	originalContent: string
+	pathHash: string
 	title: string
 }

@@ -3,8 +3,9 @@ use std::sync::Mutex;
 
 
 #[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Recipe {
-	pub hash: String,
+	pub content_hash: String,
 	/** Raw Markdown containing the parsed Ingredients section. */
 	pub ingredients: String,
 	/** Raw Markdown containing the parsed Instructions section. */
@@ -12,6 +13,7 @@ pub struct Recipe {
 	pub metadata: RecipeMetadata,
 	/** The full content of the file as originally parsed. We might not need this... */
 	pub original_content: String,
+	pub path_hash: String,
 	pub title: String,
 }
 
@@ -60,14 +62,14 @@ impl RecipeState {
 		Ok(())
 	}
 
-	pub fn get_recipe(&self, hash: &str) -> Result<Option<Recipe>, String> {
+	pub fn get_recipe(&self, path_hash: &str) -> Result<Option<Recipe>, String> {
 		self.recipes
 			.lock()
 			.map_err(|e| e.to_string())
 			.map(|recipes| {
 				recipes
 					.iter()
-					.find(|recipe| recipe.hash == hash)
+					.find(|recipe| recipe.path_hash == path_hash)
 					.cloned()
 			})
 	}

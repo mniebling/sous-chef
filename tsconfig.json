@@ -10,7 +10,9 @@
 		"lib": [
 			"DOM",
 			"ES2018"
-		]
+		],
+		"noImplicitReturns": true,
+		"strict": true
 	},
 	"include": [
 		"./src/**/*.ts",

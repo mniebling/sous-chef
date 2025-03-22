@@ -1,4 +1,3 @@
-import { invoke } from '@tauri-apps/api/core'
 import classNames from 'classnames'
 import { useEffect, useRef, useState } from 'react'
 import rehypeSanitize from 'rehype-sanitize'
@@ -6,11 +5,13 @@ import rehypeStringify from 'rehype-stringify'
 import remarkParse from 'remark-parse'
 import remarkRehype from 'remark-rehype'
 import { unified } from 'unified'
-import { emit } from './events'
+import { emit, invoke } from './events'
 import css from './RecipeView.module.css'
 
 export interface RecipeViewProps {
-	recipeHash: string
+	/** Used to force the component to fetch recipe data and re-render. */
+	dataLastUpdated: number
+	recipePathHash: string
 }
 
 // TODO: Surface to the user when a recipe hash isn't found.
@@ -25,8 +26,17 @@ export function RecipeView(props: RecipeViewProps) {
 
 	// TODO: Try out React 19 action hook here
 	useEffect(() => {
-		getRecipe(props.recipeHash).then(setRecipe)
-	}, [props.recipeHash])
+		getRecipe(props.recipePathHash)
+			.then((recipe) => setRecipe(recipe))
+			// One error case is that the user refreshed recipes and the current recipe
+			// by path hash no longer exists. In this case, return to the list view.
+			// Obviously we might have to disambiguate errors in the future.
+			.catch((error) => {
+				console.error(error)
+				console.info('Redirecting to recipes list.')
+				emit('web:navigate-to-recipes-list')
+			})
+	}, [props.dataLastUpdated, props.recipePathHash])
 
 	// TODO: If this works well on-device, abstract this into a hook
 	useEffect(() => {
@@ -42,8 +52,10 @@ export function RecipeView(props: RecipeViewProps) {
 		try {
 			wakeLock.current = await navigator.wakeLock.request('screen')
 		}
-		catch (err) {
-			setWakeLockError(`${err.name}, ${err.message}`)
+		catch (err: unknown) {
+			if (err instanceof DOMException) {
+				setWakeLockError(`${err.name}, ${err.message}`)
+			}
 		}
 	}
 
@@ -102,15 +114,15 @@ export function RecipeView(props: RecipeViewProps) {
 	)
 }
 
-async function getRecipe(recipeHash: string) {
+async function getRecipe(recipePathHash: string) {
 
 	try {
-		const recipe = await invoke('get_recipe', { recipeHash }) // TODO: type-safe `invoke` calls
-		console.log(recipe)
+		const recipe = await invoke('get_recipe', { recipePathHash })
+		console.info('Loaded recipe:', recipe)
 		return recipe
 	}
 	catch (e) {
-		console.error('Error getting recipe', e)
+		throw new Error(`Couldn't get recipe with path hash ${recipePathHash}`)
 	}
 }
 
